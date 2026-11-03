@@ -71,7 +71,7 @@ engine directly; everything flows through the daemon socket.
 From a local checkout (recommended while the release repo is private):
 
 ```bash
-git clone https://github.com/alaye-systems/alaye-os.git
+git clone https://github.com/frdp001/agentos.git
 cd alaye-os
 ./scripts/installer/install.sh
 ```
@@ -79,7 +79,7 @@ cd alaye-os
 When piped from the internet:
 
 ```bash
-curl -fsSL https://get.alaye.os/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/frdp001/agentos/main/scripts/installer/install.sh | bash
 ```
 
 The installer is idempotent. It will:
@@ -110,7 +110,7 @@ Engine overrides (environment): `ALAYE_HERMES_REPO`, `ALAYE_HERMES_REF`,
 ### Option B — Windows installer
 
 ```powershell
-git clone https://github.com/alaye-systems/alaye-os.git
+git clone https://github.com/frdp001/agentos.git
 cd alaye-os
 powershell -ExecutionPolicy Bypass -File scripts\installer\install.ps1
 ```

@@ -78,4 +78,7 @@ mac:
       arch: [x64, arm64]
   category: public.app-category.business
 
-publish: null
+publish:
+  - provider: github
+    owner: frdp001
+    repo: agentos

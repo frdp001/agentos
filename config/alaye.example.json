@@ -13,7 +13,7 @@
     "minDelaySeconds": 45
   },
   "updater": {
-    "manifestUrl": "https://github.com/alaye-systems/alaye-os-releases/releases/latest/download/manifest.json",
+    "manifestUrl": "https://github.com/frdp001/agentos/releases/latest/download/manifest.json",
     "autoCheckIntervalHours": 24
   }
 }

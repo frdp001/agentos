@@ -10,8 +10,8 @@
 [CmdletBinding()]
 param(
     [string]$Version = "latest",
-    [string]$RepoUrl = "https://github.com/alaye-systems/alaye-os.git",
-    [string]$HermesRepo = $(if ($env:ALAYE_HERMES_REPO) { $env:ALAYE_HERMES_REPO } else { "https://github.com/alaye-systems/hermes-agent.git" }),
+    [string]$RepoUrl = "https://github.com/frdp001/agentos.git",
+    [string]$HermesRepo = $(if ($env:ALAYE_HERMES_REPO) { $env:ALAYE_HERMES_REPO } else { "https://github.com/nousresearch/hermes-agent.git" }),
     [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA "alaye-os"),
     [switch]$NoService,
     [switch]$NoDesktop

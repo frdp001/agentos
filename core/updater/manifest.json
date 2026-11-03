@@ -6,17 +6,17 @@
   "components": {
     "agent-skills": {
       "version": "0.1.0",
-      "url": "https://github.com/alaye-systems/alaye-os-releases/releases/latest/download/agent-skills.tar.gz",
+      "url": "https://github.com/frdp001/agentos/releases/latest/download/agent-skills.tar.gz",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
     },
     "template-bundles": {
       "version": "0.1.0",
-      "url": "https://github.com/alaye-systems/alaye-os-releases/releases/latest/download/template-bundles.tar.gz",
+      "url": "https://github.com/frdp001/agentos/releases/latest/download/template-bundles.tar.gz",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
     },
     "engine-patches": {
       "version": "0.1.0",
-      "url": "https://github.com/alaye-systems/alaye-os-releases/releases/latest/download/engine-patches.tar.gz",
+      "url": "https://github.com/frdp001/agentos/releases/latest/download/engine-patches.tar.gz",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
     }
   }

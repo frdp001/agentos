@@ -7,7 +7,7 @@
 # drops desktop/application shortcuts.
 #
 # Usage:
-#   curl -fsSL https://get.alaye.os/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/frdp001/agentos/main/scripts/installer/install.sh | bash
 #   ./install.sh [--prefix DIR] [--version TAG] [--no-service] [--no-desktop]
 #
 set -euo pipefail
@@ -15,7 +15,7 @@ set -euo pipefail
 APP_NAME="Alaye OS"
 APP_SLUG="alaye-os"
 INSTALL_ROOT="${ALAYE_INSTALL_ROOT:-$HOME/.alaye-os}"
-REPO_URL="${ALAYE_REPO_URL:-https://github.com/alaye-systems/alaye-os.git}"
+REPO_URL="${ALAYE_REPO_URL:-https://github.com/frdp001/agentos.git}"
 APP_VERSION="${ALAYE_VERSION:-latest}"
 HERMES_REPO="${ALAYE_HERMES_REPO:-https://github.com/nousresearch/hermes-agent.git}"
 HERMES_REF="${ALAYE_HERMES_REF:-main}"

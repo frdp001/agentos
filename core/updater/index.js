@@ -24,7 +24,7 @@ const crypto = require('node:crypto');
 
 const DEFAULT_MANIFEST_URL =
   process.env.ALAYE_UPDATE_MANIFEST ||
-  'https://github.com/alaye-systems/alaye-os-releases/releases/latest/download/manifest.json';
+  'https://github.com/frdp001/agentos/releases/latest/download/manifest.json';
 
 const COMPONENTS = ['agent-skills', 'template-bundles', 'engine-patches'];
 
