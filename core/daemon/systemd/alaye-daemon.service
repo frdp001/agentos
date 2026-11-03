@@ -1,0 +1,42 @@
+[Unit]
+Description=Alaye OS - Hermes outreach gateway daemon
+Documentation=https://alaye.os/docs
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+# __INSTALL_ROOT__ is substituted by install.sh at install time.
+ExecStart=__NODE_BIN__ __INSTALL_ROOT__/core/daemon/index.js
+WorkingDirectory=__INSTALL_ROOT__
+Restart=on-failure
+RestartSec=3
+KillMode=mixed
+TimeoutStopSec=15
+
+Environment=NODE_ENV=production
+Environment=ALAYE_LOG_LEVEL=info
+Environment=ALAYE_DATA_DIR=%h/.alaye-os/data
+# Embedded Hermes engine: the isolated venv comes first so `hermes`
+# resolves to the pinned install, never an unrelated global one.
+Environment=PATH=__VENV_BIN__:/usr/local/bin:/usr/bin:/bin
+Environment=HERMES_HOME=__ENGINE_DIR__
+Environment=HERMES_BIN=__VENV_BIN__/hermes
+EnvironmentFile=-%h/.alaye-os/alaye.env
+
+# Hardening: the gateway only needs its runtime socket and data dir.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.alaye-os
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictNamespaces=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,29 @@
+{
+  "name": "alaye-os",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Alaye OS - white-labeled B2B outreach agent runtime built on the embedded Hermes Agent core.",
+  "license": "UNLICENSED",
+  "author": "Alaye Systems",
+  "workspaces": [
+    "apps/*",
+    "core/*"
+  ],
+  "engines": {
+    "node": ">=20.10.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace @alaye/desktop",
+    "build": "npm run build --workspace @alaye/desktop",
+    "dist": "npm run dist --workspace @alaye/desktop",
+    "daemon": "node core/daemon/index.js",
+    "update": "node core/updater/index.js --check",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p apps/desktop/jsconfig.json",
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
+}

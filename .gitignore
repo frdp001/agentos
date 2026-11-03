@@ -1,0 +1,25 @@
+node_modules/
+dist/
+out/
+release/
+build/Release/
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+.env
+.env.*
+!.env.example
+
+config/local.json
+config/secrets.json
+core/updater/cache/
+core/updater/staging/
+
+# Python runtime (embedded Hermes core)
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/

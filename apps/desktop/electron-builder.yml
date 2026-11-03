@@ -1,0 +1,81 @@
+# Alaye OS - electron-builder production configuration.
+# Referenced from package.json via "build": { "extends": "./electron-builder.yml" }.
+appId: os.alaye.desktop
+productName: Alaye OS
+copyright: Copyright (c) Alaye Systems
+asar: true
+compression: maximum
+# Native addons (keytar) must be built on a host with libsecret-1-dev
+# (Linux) / Windows SDK installed. Disable implicit rebuild in CI/dry-runs.
+npmRebuild: false
+
+directories:
+  output: ../../release
+  buildResources: build
+
+files:
+  - main/**/*
+  - preload/**/*
+  - renderer/dist/**/*
+  - package.json
+
+extraResources:
+  - from: ../../core
+    to: core
+    filter:
+      - "**/*"
+      - "!**/node_modules/**"
+      - "!**/*.log"
+  # Editable provider credentials, copied to resources/config/default-provider.json
+  # so builds can be re-keyed without repackaging (see main/ipc-handlers.js).
+  - from: config/default-provider.json
+    to: config/default-provider.json
+
+# --- Linux: portable AppImage + Debian package ------------------------------
+linux:
+  target:
+    - target: AppImage
+      arch: [x64, arm64]
+    - target: deb
+      arch: [x64, arm64]
+  category: Office
+  icon: build/icons
+  synopsis: B2B outreach agent console
+  description: White-labeled Hermes-powered outreach agent for B2B sales teams.
+  desktop:
+    Name: Alaye OS
+    Comment: B2B outreach agent console
+    Categories: Office;Network;
+    StartupWMClass: Alaye OS
+
+deb:
+  depends:
+    - libnotify4
+    - libnss3
+    - libxtst6
+
+# --- Windows: standalone NSIS installer ------------------------------------
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: build/icon.ico
+  artifactName: ${productName}-Setup-${version}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Alaye OS
+  deleteAppDataOnUninstall: false
+
+# --- macOS: dmg -------------------------------------------------------------
+mac:
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+  category: public.app-category.business
+
+publish: null

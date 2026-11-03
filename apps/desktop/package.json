@@ -1,0 +1,48 @@
+{
+  "name": "@alaye/desktop",
+  "productName": "Alaye OS",
+  "description": "Alaye OS desktop shell - campaign, template, triage and provider management for the Hermes outreach core.",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main/index.js",
+  "author": "Alaye Systems",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "concurrently -k -n VITE,ELECTRON -c cyan,magenta \"npm:dev:renderer\" \"npm:dev:electron\"",
+    "dev:renderer": "vite",
+    "dev:electron": "wait-on tcp:5273 && cross-env ALAYE_DEV=1 electron .",
+    "build:renderer": "vite build",
+    "build": "npm run build:renderer && electron-builder --dir",
+    "dist": "npm run build:renderer && electron-builder",
+    "dist:linux": "npm run build:renderer && electron-builder --linux AppImage deb",
+    "dist:win": "npm run build:renderer && electron-builder --win nsis",
+    "dist:mac": "npm run build:renderer && electron-builder --mac dmg"
+  },
+  "dependencies": {
+    "@alaye/core-daemon": "*",
+    "@alaye/core-updater": "*",
+    "@alaye/shared": "*",
+    "electron-log": "^5.1.5",
+    "electron-store": "^8.2.0",
+    "get-port": "^5.1.1",
+    "keytar": "^7.9.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "31.7.7",
+    "electron-builder": "^24.13.3",
+    "postcss": "^8.4.41",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.10",
+    "vite": "^5.4.2",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "extends": "./electron-builder.yml"
+  }
+}

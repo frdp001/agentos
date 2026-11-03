@@ -1,0 +1,19 @@
+{
+  "channel": "stable",
+  "providers": {
+    "default": "ollama",
+    "openai": { "model": "gpt-4o-mini" },
+    "anthropic": { "model": "claude-3-5-sonnet-latest" },
+    "ollama": { "endpoint": "http://127.0.0.1:11434", "model": "llama3.1:8b" }
+  },
+  "outreach": {
+    "fromName": "",
+    "fromEmail": "",
+    "dailySendCap": 200,
+    "minDelaySeconds": 45
+  },
+  "updater": {
+    "manifestUrl": "https://github.com/alaye-systems/alaye-os-releases/releases/latest/download/manifest.json",
+    "autoCheckIntervalHours": 24
+  }
+}
