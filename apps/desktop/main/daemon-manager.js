@@ -60,6 +60,23 @@ class DaemonManager {
     return path.join(this.appRoot, 'config', 'default-provider.json');
   }
 
+  /**
+   * Bundled engine directory (resources/engine) when the app was packaged with
+   * one. Returned so the daemon can point Hermes at it via ALAYE_ENGINE_DIR.
+   */
+  resolveEngineDir() {
+    if (!process.resourcesPath) return null;
+    const dir = path.join(process.resourcesPath, 'engine');
+    if (
+      fs.existsSync(path.join(dir, 'hermes_launcher.py')) ||
+      fs.existsSync(path.join(dir, 'hermes.cmd')) ||
+      fs.existsSync(path.join(dir, 'hermes.exe'))
+    ) {
+      return dir;
+    }
+    return null;
+  }
+
   /** Path to the daemon entrypoint for the current run mode. */
   resolveEntrypoint() {
     const coreDir = this.isDev
@@ -75,6 +92,8 @@ class DaemonManager {
       throw new Error(`daemon entrypoint not found at ${entry}`);
     }
 
+    const engineDir = this.resolveEngineDir();
+
     this.child = spawn(process.execPath, [entry], {
       cwd: path.dirname(path.dirname(entry)),
       env: {
@@ -86,6 +105,7 @@ class DaemonManager {
         ALAYE_APP_ROOT: this.appRoot,
         ALAYE_PROVIDER_CONFIG: this.resolveProviderConfigPath(),
         ALAYE_ENV_FILE: process.env.ALAYE_ENV_FILE || path.join(os.homedir(), '.alaye-os', 'alaye.env'),
+        ...(engineDir && { ALAYE_ENGINE_DIR: engineDir }),
       },
       stdio: ['ignore', 'pipe', 'pipe'],
       windowsHide: true,

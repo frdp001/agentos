@@ -264,6 +264,38 @@ Artifacts land in `release/`. Configuration lives in
 `apps/desktop/electron-builder.yml` (referenced from `package.json` via
 `"build": { "extends": "./electron-builder.yml" }`).
 
+### Windows engine bundling (self-contained installer)
+
+By default the NSIS installer ships the UI but not the Python engine, so the
+daemon runs in scaffold mode until an engine exists. To make the installer
+self-contained (no Python/git/network on the target), bundle the engine first:
+
+```powershell
+# On a Windows build host (needs Python 3.10+ and git):
+npm run bundle:engine:win        # generates apps/desktop/engine-bundle/
+npm run dist:win                 # bundles it as resources/engine into the NSIS payload
+```
+
+`bundle:engine:win` runs `scripts/bundle-engine.ps1`, which:
+
+1. Downloads an embeddable CPython runtime into `engine-bundle/python/`.
+2. `pip install`s `hermes-agent` and its dependencies into
+   `engine-bundle/python/Lib/site-packages/`.
+3. Generates `hermes_launcher.py` + `hermes.cmd` shims and
+   `bundle-manifest.json`.
+
+electron-builder then copies `engine-bundle/` to `resources/engine`, and the
+daemon sets `ALAYE_ENGINE_DIR` to it. `gateway.js` resolves the bundled
+`hermes` via the embedded Python launcher (falling back to a venv or a global
+`hermes`). Expect roughly **80–300 MB** added to the installer; run
+`ALAYE_HERMES_REPO`/`ALAYE_HERMES_REF` env vars to pin the engine source.
+
+`engine-bundle/` is generated and git-ignored. When it is empty the packaging
+step simply copies nothing and the app falls back to the venv/global engine.
+
+> Engine upgrades can still ship via the OTA `engine-patches` channel without a
+> full reinstall.
+
 The installer stages `release/*.AppImage` and `release/*.deb` into
 `~/.alaye-os/release` and makes the `alaye-os` launcher prefer the AppImage when
 present. On Windows the launcher prefers

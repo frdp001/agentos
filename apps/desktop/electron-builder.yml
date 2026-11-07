@@ -30,6 +30,14 @@ extraResources:
   # so builds can be re-keyed without repackaging (see main/ipc-handlers.js).
   - from: config/default-provider.json
     to: config/default-provider.json
+  # Self-contained Hermes engine (Python runtime + hermes-agent), populated by
+  # scripts/bundle-engine.ps1. When empty only the placeholders exist.
+  - from: engine-bundle
+    to: engine
+    filter:
+      - "**/*"
+      - "!.gitkeep"
+      - "!.gitignore"
 
 # --- Linux: portable AppImage + Debian package ------------------------------
 linux:

@@ -23,17 +23,36 @@ const { EmailService } = require('./services/email-service');
 const ENGINE_DIR = path.join(os.homedir(), '.alaye-os', 'engine');
 const MEMORY_DIR = path.join(os.homedir(), '.alaye-os', 'memory');
 
-/** Root of the embedded Hermes install (HERMES_HOME overrides). */
+/**
+ * Root of the embedded Hermes install. Precedence:
+ *   HERMES_HOME (explicit) > ALAYE_ENGINE_DIR (bundled resources/engine) >
+ *   ~/.alaye-os/engine (installer-provisioned venv).
+ */
 function resolveHermesHome() {
-  return process.env.HERMES_HOME || ENGINE_DIR;
+  return process.env.HERMES_HOME || process.env.ALAYE_ENGINE_DIR || ENGINE_DIR;
 }
 
-/** Platform-specific path to the CLI installed by the isolated venv. */
-function embeddedHermesBinary() {
+/** Candidate CLI paths, covering installer venv and bundled layouts. */
+function embeddedHermesCandidates() {
   const home = resolveHermesHome();
   return process.platform === 'win32'
-    ? path.join(home, 'venv', 'Scripts', 'hermes.exe')
-    : path.join(home, 'venv', 'bin', 'hermes');
+    ? [
+        path.join(home, 'venv', 'Scripts', 'hermes.exe'),
+        path.join(home, 'hermes.exe'),
+        path.join(home, 'hermes.cmd'),
+        path.join(home, 'Scripts', 'hermes.exe'),
+      ]
+    : [
+        path.join(home, 'venv', 'bin', 'hermes'),
+        path.join(home, 'bin', 'hermes'),
+        path.join(home, 'hermes'),
+      ];
+}
+
+/** First existing CLI candidate, else the platform-default venv path. */
+function embeddedHermesBinary() {
+  const candidates = embeddedHermesCandidates();
+  return candidates.find((c) => fs.existsSync(c)) || candidates[0];
 }
 
 /** Locate an executable on PATH without shelling out. */
@@ -252,12 +271,42 @@ class HermesGateway {
     return env;
   }
 
+  /**
+   * Build the actual (command, args) to execute. Handles two bundling shapes:
+   *   - bundled embeddable Python: run `python/hermes_launcher.py`
+   *   - a `.cmd`/`.bat` shim on Windows: run via the command interpreter
+   *   - a native `hermes` executable: run directly
+   */
+  hermesInvocation(args = []) {
+    const home = this.hermesHome;
+    const pyCandidates =
+      process.platform === 'win32'
+        ? [path.join(home, 'python', 'python.exe')]
+        : [
+            path.join(home, 'python', 'bin', 'python3'),
+            path.join(home, 'bin', 'python3'),
+            path.join(home, 'python', 'python3'),
+          ];
+    const pyExe = pyCandidates.find((c) => fs.existsSync(c));
+    const launcher = path.join(home, 'hermes_launcher.py');
+
+    if (pyExe && fs.existsSync(launcher)) {
+      return { command: pyExe, args: [launcher, ...args] };
+    }
+    if (process.platform === 'win32' && /\.(cmd|bat)$/i.test(this.hermesBinary || '')) {
+      const line = [this.hermesBinary, ...args].map((a) => `"${String(a).replace(/"/g, '\\"')}"`).join(' ');
+      return { command: process.env.ComSpec || 'cmd.exe', args: ['/d', '/s', '/c', line] };
+    }
+    return { command: this.hermesBinary, args };
+  }
+
   /** True when the embedded Hermes gateway process is already up. */
   isGatewayRunning() {
     if (this.hermesProcess && this.hermesProcess.exitCode === null) return true;
     if (!this.hermesBinary) return false;
     // Probe the CLI; a non-zero/absent status command means "not running".
-    const probe = spawnSync(this.hermesBinary, ['gateway', 'status'], {
+    const { command, args } = this.hermesInvocation(['gateway', 'status']);
+    const probe = spawnSync(command, args, {
       cwd: this.hermesHome,
       env: this.hermesEnv(),
       timeout: 3000,
@@ -274,7 +323,8 @@ class HermesGateway {
   spawnGateway() {
     return new Promise((resolve, reject) => {
       this.log('info', 'starting embedded hermes gateway', { bin: this.hermesBinary });
-      const child = spawn(this.hermesBinary, ['gateway', 'start'], {
+      const { command, args } = this.hermesInvocation(['gateway', 'start']);
+      const child = spawn(command, args, {
         cwd: this.hermesHome,
         env: this.hermesEnv(),
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -655,10 +705,11 @@ class HermesGateway {
     if (!bin) return this._scaffoldChat(message, sessionId, onToken);
 
     return new Promise((resolve, reject) => {
-      const args = ['chat', '--json-stream'];
-      if (sessionId) args.push('--session', sessionId);
-      if (systemPrompt) args.push('--system', systemPrompt);
-      const child = spawn(bin, args, {
+      const chatArgs = ['chat', '--json-stream'];
+      if (sessionId) chatArgs.push('--session', sessionId);
+      if (systemPrompt) chatArgs.push('--system', systemPrompt);
+      const { command, args } = this.hermesInvocation(chatArgs);
+      const child = spawn(command, args, {
         cwd: this.hermesHome,
         env: this.hermesEnv(),
         stdio: ['pipe', 'pipe', 'pipe'],
